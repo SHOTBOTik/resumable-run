@@ -1,0 +1,32 @@
+{
+  "name": "resumable-run",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Resumable batch runs over large task lists: atomic checkpoints, stable hash sharding, concurrency limit, cursor pagination.",
+  "type": "module",
+  "license": "MIT",
+  "author": "SHOTBOTik (https://shotbotik.me)",
+  "homepage": "https://shotbotik.me",
+  "keywords": [
+    "batch",
+    "checkpoint",
+    "resume",
+    "sharding",
+    "concurrency",
+    "pagination"
+  ],
+  "engines": {
+    "node": ">=22.18"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "node --test \"test/**/*.test.ts\""
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "typescript": "^5.9.3"
+  }
+}
