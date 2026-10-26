@@ -6,7 +6,11 @@
   "type": "module",
   "license": "MIT",
   "author": "SHOTBOTik (https://shotbotik.me)",
-  "homepage": "https://shotbotik.me",
+  "homepage": "https://github.com/SHOTBOTik/resumable-run#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SHOTBOTik/resumable-run.git"
+  },
   "keywords": [
     "batch",
     "checkpoint",

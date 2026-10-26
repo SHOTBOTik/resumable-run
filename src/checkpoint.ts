@@ -63,8 +63,19 @@ export class Checkpoint<T = unknown> {
     return this.done.entries();
   }
 
-  /** Отметить задачу готовой. На диск попадёт по правилу flushEvery или при flush(). */
+  /**
+   * Отметить задачу готовой. На диск попадёт по правилу flushEvery или при flush().
+   * Результат, который не записать в JSON (BigInt, циклическая ссылка, функция), — ошибка с id задачи; в контрольную
+   * точку он не попадает, иначе каждая следующая запись падала бы на нём же.
+   */
   set(id: string, value: T): void {
+    let text: string | undefined;
+    try {
+      text = JSON.stringify(value);
+    } catch (err) {
+      throw new Error(`задача ${id}: результат не записать в JSON (${err instanceof Error ? err.message : String(err)}); BigInt верните строкой`, { cause: err });
+    }
+    if (text === undefined && value !== undefined) throw new Error(`задача ${id}: результат типа ${typeof value} не записать в JSON`);
     this.done.set(id, value);
     if (++this.pending >= this.flushEvery) this.flush();
   }

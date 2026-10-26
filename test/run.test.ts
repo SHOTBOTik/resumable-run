@@ -136,6 +136,24 @@ test('задача без результата (undefined) тоже записа
   assert.equal(calls, 3);
 });
 
+test('результат, который не записать в JSON, — понятная ошибка с id задачи, остальные задачи не страдают', async () => {
+  const file = join(fresh(), 'cp.json');
+  const cyclic: Record<string, unknown> = {};
+  cyclic.self = cyclic;
+  const results: Record<string, unknown> = { a: 1n, b: 2, c: cyclic, d: () => 0, e: 'ok' };
+  const opts = { items: Object.keys(results), id: (x: string) => x, checkpoint: file, concurrency: 1, task: async (x: string) => results[x] };
+  const first = await run(opts);
+  assert.deepEqual([first.done, first.failed], [2, 3]);
+  assert.deepEqual(first.errors.map((e) => e.id), ['a', 'c', 'd']);
+  assert.match(String(first.errors[0]!.error), /задача a: результат не записать в JSON .*BigInt/);
+  assert.match(String(first.errors[2]!.error), /задача d: результат типа function/);
+  // в файл попали только хорошие результаты, следующий запуск повторит упавшие
+  assert.deepEqual(Object.keys(JSON.parse(readFileSync(file, 'utf8')).done).sort(), ['b', 'e']);
+  results.a = '1';
+  const second = await run(opts);
+  assert.deepEqual([second.skipped, second.done, second.failed], [2, 1, 2]);
+});
+
 test('контрольная точка: атомарная запись, обрывок .tmp игнорируется, битый файл — ошибка', () => {
   const dir = fresh();
   const file = join(dir, 'cp.json');
